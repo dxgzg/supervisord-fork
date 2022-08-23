@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Go-Supervisor</title>
+    <title>Deucalion</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/bootstrap-table.css"/>
@@ -143,6 +143,10 @@
     }
 
     function reformatPrograms( programs ) {
+        let fileIco = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-files\" viewBox=\"0 0 16 16\">\\n' +\n" +
+            "                '  <path d=\"M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z\"/>\\n' +\n" +
+            "                '</svg>"
+
         for( var i in programs ) {
             var statename = programs[i]['statename'];
             var action = "";
@@ -158,9 +162,11 @@
                 action = action + '<button type="button" disabled class="btn btn-primary mr-1" onclick="restartProgram(\'' + programs[i]['name'] + '\');">ReStart</button>';
                 color = "red";
             }
-            let logLabel = '<a href=/log?name=' + programs[i]['name'] + '>日志列表 </a>';
 
-            action = action + logLabel;
+            let logLabel = fileIco + '<a href=/log?name=' + programs[i]['name'] + '>日志列表 </a>';
+
+            let confFile = fileIco + '<a href=/confFile/read?name=' + programs[i]['name'] + '>conf文件 </a>';
+            action = action + logLabel + confFile;
 
             programs[i]['action'] = action;
             programs[i]['statename'] = '<div style="background-color:' + color + ';">' + statename + '</div>';
@@ -300,13 +306,13 @@
     });
 </script>
 <body>
-<H1 class="text-center text-success">Go-Supervisor</H1>
+<H1 class="text-center text-success">Deucalion</H1>
 <div class="container">
     <div class='row'>
         <div class="col-12">
 
             <a href="http://10.234.254.27:9996/graph" class="text-decoration-none mr-3" target="_blank">Prometheus</a>
-            <a href="http://127.0.0.1:3000" class="text-decoration-none" target="_blank">Grafana</a>
+            <a href="http://127.0.0.1:3000/d/aka/1-node-exporter-dashboard-22-04-13-consulmanagerzi-dong-tong-bu-ban?orgId=1" class="text-decoration-none" target="_blank">Grafana</a>
 
             <input type="button" class="btn btn-primary float-right mr-1" value="Shutdown" onclick='shutdown_supervisor();'>
             <input type="button" class="btn btn-primary float-right mr-1" value="Reload" onclick='reload_supervisor();'>

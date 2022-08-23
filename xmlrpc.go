@@ -4,6 +4,7 @@ import (
 	"crypto/sha1" //nolint:gosec
 	"encoding/hex"
 	"fmt"
+	"github.com/ochinchina/supervisord/types"
 	"io"
 	"io/ioutil"
 	"net"
@@ -13,12 +14,18 @@ import (
 	"strings"
 
 	"github.com/gorilla/rpc"
+	"github.com/gorilla/schema"
 	"github.com/ochinchina/gorilla-xmlrpc/xml"
 	"github.com/ochinchina/supervisord/process"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/gin-gonic/gin"
 )
+
+var decoder = schema.NewDecoder()
 
 // XMLRPC mange the XML RPC servers
 // start XML RPC servers to accept the XML RPC request from client side
@@ -134,6 +141,57 @@ func readLogHtml(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(b)
 }
 
+type cache struct {
+	Bucket    string `json:"bucket"`
+	Namespace string `json:"namespace"`
+	RefTime   int    `json:"reftime"`
+	UnRefTime int    `json:"unreftime"`
+	LeftSize  int    `json:"leftsize"`
+}
+
+func clearCache(writer http.ResponseWriter, request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		writer.WriteHeader(404)
+		return
+	}
+
+	c := cache{}
+	err = decoder.Decode(&c, request.URL.Query())
+	if err != nil {
+		log.Println("Error in GET parameters : ", err)
+	} else {
+		log.Println("GET parameters : ", c)
+	}
+
+	//c.Namespace = "NaviDev"
+
+	log.Println("GET parameters : ", c)
+
+	writer.WriteHeader(200)
+
+	//url := "http://10.234.254.27:8070/gm/clearCache"
+	//
+	//jsonStr, err := json.Marshal(c)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//fmt.Println("jsonStr", jsonStr)
+	//
+	//req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	// req.Header.Set("X-Custom-Header", "myvalue")
+	//req.Header.Set("Content-Type", "application/json")
+	//
+	//client := &http.Client{}
+	//res, err := client.Do(req)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//fmt.Printf("%+v", res)
+	//fmt.Println("res:", res)
+}
+
 func (p *XMLRPC) startHTTPServer(user string, password string, protocol string, listenAddr string, s *Supervisor, startedCb func()) {
 	if p.isHTTPServerStartedOnProtocol(protocol) {
 		startedCb()
@@ -159,17 +217,11 @@ func (p *XMLRPC) startHTTPServer(user string, password string, protocol string, 
 
 	// conf 文件
 	confHandler := NewConfApi(s).CreateHandler()
-	mux.Handle("/conf/", newHTTPBasicAuth(user, password, confHandler))
-	mux.HandleFunc("/confFile", func(writer http.ResponseWriter, request *http.Request) {
-		b, err := readFile("webgui/conf.html")
-		if err != nil {
-			writer.WriteHeader(http.StatusNotFound)
-			return
-		}
+	mux.Handle("/confFile/", newHTTPBasicAuth(user, password, confHandler))
 
-		writer.WriteHeader(http.StatusOK)
-		writer.Write(b)
-	})
+	//gmHandler := NewGM(s).CreateHandler()
+	//mux.Handle(, newHTTPBasicAuth(user, password, gmHandler))
+	mux.HandleFunc("/gm/clearCache", clearCache)
 
 	// 读log.html文件
 	mux.HandleFunc("/log", readLogHtml)
@@ -193,12 +245,29 @@ func (p *XMLRPC) startHTTPServer(user string, password string, protocol string, 
 		mux.Handle("/log/"+realName+"/", http.StripPrefix("/log/"+realName+"/", http.FileServer(http.Dir(dir))))
 	}
 
+	engine := gin.Default()
+	engine.GET("/program/list", func(context *gin.Context) {
+		result := struct{ AllProcessInfo []types.ProcessInfo }{make([]types.ProcessInfo, 0)}
+		if s.GetAllProcessInfo(nil, nil, &result) == nil {
+			context.JSON(200, result.AllProcessInfo)
+		} else {
+			r := map[string]bool{"success": false}
+			context.JSON(200, r)
+		}
+	})
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+	handler := c.Handler(engine)
+
 	listener, err := net.Listen(protocol, listenAddr)
 	if err == nil {
 		log.WithFields(log.Fields{"addr": listenAddr, "protocol": protocol}).Info("success to listen on address")
 		p.listeners[protocol] = listener
 		startedCb()
-		http.Serve(listener, mux)
+		http.Serve(listener, handler)
 	} else {
 		startedCb()
 		log.WithFields(log.Fields{"addr": listenAddr, "protocol": protocol}).Fatal("fail to listen on address")

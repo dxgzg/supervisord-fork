@@ -8,4 +8,4 @@ import (
 )
 
 //HTTP auto generated
-var HTTP http.FileSystem = http.Dir("./webgui")
+var HTTP http.FileSystem = http.Dir("./webgui/dist")

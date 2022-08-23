@@ -8,35 +8,36 @@
 <script src="js/axios.min.js"></script>
 <script src='js/jquery-3.3.1.min.js'></script>
 <script src="js/common.js"></script>
+
 <link rel="stylesheet" href="css/bootstrap.min.css"/>
 <link rel="stylesheet" href="css/bootstrap-table.css"/>
 <link rel="stylesheet" href="css/bootstrap-dialog.min.css"/>
-<div id="app">
-
+<div id="app" class="text-justify">
 </div>
 
 <script>
     $(document).ready(function () {
         let name = getUrlVars()["name"];
-        console.log(name)
+        // console.log(name)
         getLogDir(name);
     });
 
     function getLogDir(name) {
-        if (name === undefined || name.length === 0){
+        if (name === undefined || name.length === 0 || name.indexOf("#") != -1){
             $("#app").html("need url variable name")
             return
         }
 
+        // console.log(name)
         axios.get("/log/" + name).then(function (response) {
-            console.log(response.data)
+            // console.log(response.data)
             $("#app").html(response.data)
 
             $("a").each(function(){
                 $old_url = $(this).attr('href');
-                $new_url = '/log/' + name +"/" +$old_url;
+                $new_url = '#/log/' + name +"/" +$old_url;
                 $(this).attr('href',$new_url);//changed this line
-                console.log($new_url)
+                // console.log($new_url)
             });
 
             $("a").addClass("text-success")
@@ -49,7 +50,7 @@
 
     }
 
-
 </script>
+<script src="js/router.js"></script>
 </body>
 </html>

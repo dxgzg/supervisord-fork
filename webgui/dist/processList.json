@@ -1,0 +1,50 @@
+[
+  {
+    "name": "im-ddc",
+    "group": "ddc",
+    "description": "2022-08-22 16:10:50.749425562 +0800 CST m=+263595.735682533",
+    "start": 1661155528,
+    "stop": 1661155850,
+    "now": 1661155853,
+    "state": 100,
+    "statename": "Exited",
+    "spawnerr": "",
+    "exitstatus": 0,
+    "logfile": "/export/home/maguozhi/unrealddc/logs/console.log",
+    "stdout_logfile": "/export/home/maguozhi/unrealddc/logs/console.log",
+    "stderr_logfile": "/export/home/maguozhi/unrealddc/logs/console.log",
+    "pid": 0
+  },
+  {
+    "name": "se-ddc",
+    "group": "ddc",
+    "description": "pid 2088, uptime 0:00:03",
+    "start": 1661157672,
+    "stop": 0,
+    "now": 1661157675,
+    "state": 20,
+    "statename": "Running",
+    "spawnerr": "",
+    "exitstatus": 0,
+    "logfile": "/export/home/maguozhi/unrealddc/logs/console.log",
+    "stdout_logfile": "/export/home/maguozhi/unrealddc/logs/console.log",
+    "stderr_logfile": "/export/home/maguozhi/unrealddc/logs/console.log",
+    "pid": 2088
+  },
+  {
+    "name": "linx-test",
+    "group": "linx-test",
+    "description": "pid 4432, uptime 3 days, 1:13:18",
+    "start": 1660892255,
+    "stop": 0,
+    "now": 1661155853,
+    "state": 20,
+    "statename": "Running",
+    "spawnerr": "",
+    "exitstatus": 0,
+    "logfile": "",
+    "stdout_logfile": "",
+    "stderr_logfile": "",
+    "pid": 4432
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "label": "上海ddc",
+    "children": [
+      {
+        "label": "im",
+        "api": [
+          {
+            "viewName": "清除缓存",
+            "funcName": "clearCache"
+          },
+          {
+            "viewName": "添加缓存",
+            "funcName": "addCache"
+          }
+        ]
+      },
+      {
+        "label": "se",
+        "api": [
+          {
+            "viewName": "清除缓存",
+            "funcName": "clearCache"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "北京ddc"
+  }
+]

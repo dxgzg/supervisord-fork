@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ConfFile</title>
+    <!--导入js库-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="/js/axios.min.js"></script>
+    <script src='/js/jquery-3.3.1.min.js'></script>
+    <script src="/js/common.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-table.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-dialog.min.css"/>
+
+</head>
+
+<body>
+<!--代码输入框（注意请务必设置高度，否则无法显示）-->
+<pre id="code" class="ace_editor" style="min-height:850px">
+ <textarea id="text_conf" class="ace_text-input">
+
+</textarea>
+</pre>
+<button class="btn btn-primary" onclick="saveConfFile()">
+    Save
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hammer" viewBox="0 0 16 16">
+        <path d="M9.972 2.508a.5.5 0 0 0-.16-.556l-.178-.129a5.009 5.009 0 0 0-2.076-.783C6.215.862 4.504 1.229 2.84 3.133H1.786a.5.5 0 0 0-.354.147L.146 4.567a.5.5 0 0 0 0 .706l2.571 2.579a.5.5 0 0 0 .708 0l1.286-1.29a.5.5 0 0 0 .146-.353V5.57l8.387 8.873A.5.5 0 0 0 14 14.5l1.5-1.5a.5.5 0 0 0 .017-.689l-9.129-8.63c.747-.456 1.772-.839 3.112-.839a.5.5 0 0 0 .472-.334z"/>
+    </svg>
+</button>
+<script>
+    //初始化对象
+    editor = ace.edit("code");
+
+    //设置风格和语言（更多风格和语言，请到github上相应目录查看）
+    theme = "cobalt"
+    language = "java"
+    editor.setTheme("ace/theme/" + theme);
+    editor.session.setMode("ace/mode/" + language);
+
+    //字体大小
+    editor.setFontSize(18);
+
+    //设置只读（true时只读，用于展示代码）
+    editor.setReadOnly(false);
+
+    //自动换行,设置为off关闭
+    editor.setOption("wrap", "free")
+
+    editor.setOptions({
+        maxLines: Infinity
+    });
+
+
+    $(document).ready(function () {
+
+        getConfFile()
+    });
+
+    function getConfFile() {
+        let name = getProgramName()
+        console.log(name)
+        if (name === undefined || name.length === 0){
+            alert("need url variable name")
+            return
+        }
+
+        axios.get("/confFile/read/" + name).then(function (response) {
+            console.log(response.data)
+            editor.setValue(response.data)
+            const prevMarkers = editor.session.getMarkers();
+            if (prevMarkers) {
+                const prevMarkersArr = Object.keys(prevMarkers);
+                for (let item of prevMarkersArr) {
+                    editor.session.removeMarker(prevMarkers[item].id);
+                }
+            }
+        }).catch(function (err){
+            alert("ERROR:此程序未配置conf文件，如需配置参考conf_file")
+        })
+    }
+
+
+    function saveConfFile(){
+        let name = getProgramName()
+        if (name === undefined || name.length === 0){
+            alert("need url variable name")
+            return
+        }
+
+        axios.post("/confFile/modify/" + name,{"data":editor.getValue()})
+        .then(function (response) {
+            console.log(response)
+            alert("更新成功")
+        })
+        .catch(function (err){
+            alert("更新失败")
+        })
+    }
+
+    function getProgramName(){
+        let name = getUrlVars()["name"]
+        return name
+    }
+</script>
+
+</body>
+</html>
