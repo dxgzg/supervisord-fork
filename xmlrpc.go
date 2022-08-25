@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha1" //nolint:gosec
 	"encoding/hex"
 	"fmt"
+	"github.com/goccy/go-json"
+	"github.com/rs/cors"
 	"io"
 	"io/ioutil"
 	"net"
@@ -18,7 +21,6 @@ import (
 	"github.com/ochinchina/supervisord/process"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
@@ -119,16 +121,6 @@ func readFile(path string) ([]byte, error) {
 	return b, nil
 }
 
-func getProgramConfigPath(programName string, s *Supervisor) string {
-	c := s.config.GetProgram(programName)
-	if c == nil {
-		return ""
-	}
-
-	res := c.GetString("conf_file", "")
-	return res
-}
-
 func readLogHtml(writer http.ResponseWriter, request *http.Request) {
 	b, err := readFile("webgui/log.html")
 	if err != nil {
@@ -169,26 +161,26 @@ func clearCache(writer http.ResponseWriter, request *http.Request) {
 
 	writer.WriteHeader(200)
 
-	//url := "http://10.234.254.27:8070/gm/clearCache"
-	//
-	//jsonStr, err := json.Marshal(c)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//fmt.Println("jsonStr", jsonStr)
-	//
-	//req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	// req.Header.Set("X-Custom-Header", "myvalue")
-	//req.Header.Set("Content-Type", "application/json")
-	//
-	//client := &http.Client{}
-	//res, err := client.Do(req)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Printf("%+v", res)
-	//fmt.Println("res:", res)
+	url := "http://10.234.254.23:80/gm/clearCache"
+
+	jsonStr, err := json.Marshal(c)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("jsonStr", jsonStr)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%+v", res)
+	fmt.Println("res:", res)
 }
 
 func (p *XMLRPC) startHTTPServer(user string, password string, protocol string, listenAddr string, s *Supervisor, startedCb func()) {

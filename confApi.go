@@ -1,12 +1,8 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
-	"net/http"
-	"os"
-
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 type ConfApi struct {
@@ -30,52 +26,52 @@ func (ca *ConfApi) CreateHandler() http.Handler {
 }
 
 func (ca *ConfApi) modifyProgramConfFile(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	if vars == nil {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	programName := vars["program"]
-	programConfigPath := getProgramConfigPath(programName, ca.supervisor)
-	if programConfigPath == "" {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	err := ca.writeProgramConfFile(programName, request)
-	if err != nil {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	writer.WriteHeader(http.StatusOK)
-	writer.Write([]byte("ok"))
+	//vars := mux.Vars(request)
+	//if vars == nil {
+	//	writer.WriteHeader(http.StatusNotFound)
+	//	return
+	//}
+	//
+	//programName := vars["program"]
+	//programConfigPath := getProgramConfigPath(programName, ca.supervisor)
+	//if programConfigPath == "" {
+	//	writer.WriteHeader(http.StatusNotFound)
+	//	return
+	//}
+	//
+	//err := ca.writeProgramConfFile(programName, request)
+	//if err != nil {
+	//	writer.WriteHeader(http.StatusNotFound)
+	//	return
+	//}
+	//
+	//writer.WriteHeader(http.StatusOK)
+	//writer.Write([]byte("ok"))
 
 }
 
 func (ca *ConfApi) readProgramConfFile(writer http.ResponseWriter, request *http.Request) {
-	vars := mux.Vars(request)
-	if vars == nil {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	programName := vars["program"]
-	programConfigPath := getProgramConfigPath(programName, ca.supervisor)
-	if programConfigPath == "" {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	b, err := readFile(programConfigPath)
-	if err != nil {
-		writer.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	writer.WriteHeader(http.StatusOK)
-	writer.Write(b)
+	//vars := mux.Vars(request)
+	//if vars == nil {
+	//	writer.WriteHeader(http.StatusNotFound)
+	//	return
+	//}
+	//
+	//programName := vars["program"]
+	//programConfigPath := getProgramConfigPath(programName, ca.supervisor)
+	//if programConfigPath == "" {
+	//	writer.WriteHeader(http.StatusNotFound)
+	//	return
+	//}
+	//
+	//b, err := readFile(programConfigPath)
+	//if err != nil {
+	//	writer.WriteHeader(http.StatusNotFound)
+	//	return
+	//}
+	//
+	//writer.WriteHeader(http.StatusOK)
+	//writer.Write(b)
 }
 
 func (ca *ConfApi) readConfFileHtml(writer http.ResponseWriter, request *http.Request) {
@@ -95,29 +91,29 @@ func (ca *ConfApi) getConfFilePath() string {
 
 func (ca *ConfApi) writeProgramConfFile(programName string, request *http.Request) error {
 	// 根据 body 创建一个 json 解析器实例
-	decoder := json.NewDecoder(request.Body)
-	var params map[string]string
-	err := decoder.Decode(&params)
-	if err != nil {
-		return err
-	}
-
-	data, ok := params["data"]
-	if !ok {
-		return errors.New("not exist data")
-	}
-
-	programConfigPath := getProgramConfigPath(programName, ca.supervisor)
-	if programConfigPath == "" {
-		return errors.New("not exist conf file")
-	}
-
-	f, err := os.OpenFile(programConfigPath, os.O_WRONLY|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	f.Write([]byte(data))
+	//decoder := json.NewDecoder(request.Body)
+	//var params map[string]string
+	//err := decoder.Decode(&params)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//data, ok := params["data"]
+	//if !ok {
+	//	return errors.New("not exist data")
+	//}
+	//
+	//programConfigPath := getProgramConfigPath(programName, ca.supervisor)
+	//if programConfigPath == "" {
+	//	return errors.New("not exist conf file")
+	//}
+	//
+	//f, err := os.OpenFile(programConfigPath, os.O_WRONLY|os.O_TRUNC, 0644)
+	//if err != nil {
+	//	return err
+	//}
+	//defer f.Close()
+	//f.Write([]byte(data))
 
 	return nil
 }
